@@ -1,0 +1,42 @@
+﻿<Page
+    x:Class="SapLogViewer.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SapLogViewer"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Loading="Grid_Loading">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="141" />
+            <RowDefinition MinHeight="224" />
+            <RowDefinition Height="100"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="190"/>
+            <ColumnDefinition MinWidth="460"/>
+            <ColumnDefinition Width="131"/>
+        </Grid.ColumnDefinitions>
+        <ListBox x:Name="listBox" Grid.Row ="0" Grid.ColumnSpan="2" Height="100" Margin="20,30,10,0" VerticalAlignment="Top" AllowDrop="True"  />
+        <Button Content="Button" Grid.Column="2" HorizontalAlignment="Center" Margin="0,30,0,0" VerticalAlignment="Top" Width="111" Height="32" Click="Button_Click"/>
+        <Button Content="Button" Grid.Column="2" HorizontalAlignment="Center" Margin="0,98,0,0" VerticalAlignment="Top" Width="111" Height="32"/>
+        <controls:DataGrid x:Name="ctrlDataGrid" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="15" AutoGenerateColumns="False" IsReadOnly="True" 
+                           VerticalAlignment="Stretch" HorizontalAlignment="Stretch" CanUserSortColumns="True" >
+            <controls:DataGrid.Columns>
+                <controls:DataGridTextColumn Header="Date" Tag="Date" Binding="{Binding Date}" />
+                <controls:DataGridComboBoxColumn Header="Time" Tag="Time" Binding="{Binding Time}" />
+                <controls:DataGridTextColumn Header="Cl" Tag="Cl" Binding="{Binding Cl}" />
+                <controls:DataGridTextColumn Header="User"  Tag="User" Binding="{Binding User}"/>
+                <controls:DataGridTextColumn Header="PC Name"  Tag="PC_Name" Binding="{Binding PCName}"/>
+                <controls:DataGridTextColumn Header="Cod Tranzactie"  Tag="Cod_Tranzactie" Binding="{Binding Transaction}" />
+                <controls:DataGridTextColumn Header="Program"  Tag="Program" Binding="{Binding Program}" />
+                <controls:DataGridTextColumn Header="Audit Log"  Tag="Audit_Log" Binding="{Binding AuditLog}" />
+                <controls:DataGridTextColumn Header="Variable Log"  Tag="Variable_Log" Binding="{Binding VarLog}" />
+            </controls:DataGrid.Columns>
+        </controls:DataGrid>
+        <TextBlock x:Name="textBlock" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="10"/>
+    </Grid>
+</Page>
