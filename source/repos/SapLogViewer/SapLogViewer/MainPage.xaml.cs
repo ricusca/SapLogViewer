@@ -49,7 +49,38 @@ namespace SapLogViewer
 
         private void DataGrid_Sorting(object sender, DataGridColumnEventArgs e)
         {
-            
+            string previousSortedColumn = viewModel.CachedSortedColumn;
+            if (previousSortedColumn != string.Empty)
+            {
+                foreach (DataGridColumn dataGridColumn in ctrlDataGrid.Columns)
+                {
+                    if (dataGridColumn.Tag != null && dataGridColumn.Tag.ToString() == previousSortedColumn &&
+                        (e.Column.Tag == null || previousSortedColumn != e.Column.Tag.ToString()))
+                    {
+                        dataGridColumn.SortDirection = null;
+                    }
+                }
+            }
+
+            // Toggle clicked column's sorting method
+            if (e.Column.Tag != null)
+            {
+                if (e.Column.SortDirection == null)
+                {
+                    ctrlDataGrid.ItemsSource = viewModel.SortData(e.Column.Tag.ToString(), true);
+                    e.Column.SortDirection = DataGridSortDirection.Ascending;
+                }
+                else if (e.Column.SortDirection == DataGridSortDirection.Ascending)
+                {
+                    ctrlDataGrid.ItemsSource = viewModel.SortData(e.Column.Tag.ToString(), false);
+                    e.Column.SortDirection = DataGridSortDirection.Descending;
+                }
+                else
+                {
+                    ctrlDataGrid.ItemsSource = viewModel.FilterData(DataGridDataSource.FilterOptions.All,ctrlSearch.Text);
+                    e.Column.SortDirection = null;
+                }
+            }
         }
 
         private void DataGrid_LoadingRowGroup(object sender, DataGridRowGroupHeaderEventArgs e)
@@ -119,7 +150,10 @@ namespace SapLogViewer
 
         private void CtrlSearch_TextChanged(object sender, TextChangedEventArgs e)
         {
-            //(ctrlDataGrid.soru). = string.Format("Name LIKE '%{0}%'", searchTextBox.Text);
+            if (string.IsNullOrEmpty(ctrlSearch.Text))
+                ctrlDataGrid.ItemsSource = viewModel.FilterData(DataGridDataSource.FilterOptions.All, ctrlSearch.Text.ToUpper());
+            else
+                ctrlDataGrid.ItemsSource = viewModel.FilterData(DataGridDataSource.FilterOptions.Name, ctrlSearch.Text.ToUpper());
         }
 
         private void CtrlDataGrid_LoadingRowDetails(object sender, DataGridRowDetailsEventArgs e)
@@ -128,7 +162,7 @@ namespace SapLogViewer
             Grid grid = panel.Children.ElementAt(0) as Grid;
 
             DataGrid innerGrid = panel.FindName("ctrUserRow") as DataGrid;
-            innerGrid.ItemsSource = Globals._usersData["RAVRAM"].Actions;
+            //innerGrid.ItemsSource = Globals._usersData["IBAILA"].Actions;
         }
     }
 }

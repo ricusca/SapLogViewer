@@ -17,41 +17,10 @@ namespace SapLogViewer
         public static void Update(ref Dictionary<string, User> usersData)
         {
             TotalUsers = usersData.Count;
-            TotalTransactions = 0;
-            int currentMaxTransactions = -1, currentMaxPrograms = -1;
-            foreach(var user in usersData)
-            {
-                foreach(var userAction in user.Value.Actions)
-                {
-                    if (!string.IsNullOrEmpty(userAction.Transaction))
-                    {
-                        TotalTransactions++;
-
-                        user.Value.TotalTransactions++;
-                        if (user.Value.TotalTransactions > currentMaxTransactions)
-                        {
-                            currentMaxTransactions = user.Value.TotalTransactions;
-                            TopTUser = user.Key;
-                        }
-                    }
-
-                    if (!string.IsNullOrEmpty(userAction.Program))
-                    {
-                        TotalPrograms++;
-                        user.Value.TotalPrograms++;
-                        
-                        if (!string.IsNullOrEmpty(userAction.Program))
-                        {
-                            user.Value.TotalTransactions++;
-                            if (user.Value.TotalPrograms > currentMaxPrograms)
-                            {
-                                currentMaxPrograms = user.Value.TotalPrograms;
-                                TopPUser = user.Key;
-                            }
-                        }
-                    }
-                }
-            }
+            TotalTransactions = usersData.Values.Sum(u => u.TotalTransactions);
+            TotalPrograms = usersData.Values.Sum(u => u.TotalPrograms);
+            TopPUser = usersData.Values.OrderByDescending(u => TopPUser).First().Name;
+            TopTUser = usersData.Values.OrderByDescending(u => TopTUser).First().Name;
         }
 
     }

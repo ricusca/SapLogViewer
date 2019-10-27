@@ -31,7 +31,7 @@
         <Grid.Resources>
             <DataTemplate x:Key="RowDetailsTemplate">
                 <StackPanel>
-                    <Grid Margin="20,5" Padding="5" MaxHeight="1000">
+                    <Grid Margin="20,5" Padding="10" MaxHeight="1000">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
@@ -42,20 +42,20 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition MinWidth="100" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Row="0" Text="Programs:  " FontWeight="SemiBold" FontSize="13" MaxHeight="300"/>
-                        <TextBlock Grid.Row="1" Text="Transactions:  " FontWeight="SemiBold" FontSize="13" MaxHeight="300"/>
-                        <TextBlock  Grid.Row="0" Grid.Column="1" FontSize="13" Text="{Binding Programs}" HorizontalAlignment="Left" TextWrapping="Wrap" MaxHeight="300" IsTextSelectionEnabled="True" />
-                        <TextBlock Grid.Row="1" Grid.Column="1" FontSize="13" Text="{Binding Transactions}" HorizontalAlignment="Left" TextWrapping="Wrap" MaxHeight="300" IsTextSelectionEnabled="True" />
+                        <TextBlock Grid.Row="0" Text="Programs:      " FontWeight="SemiBold" FontSize="13" MaxHeight="300" Padding="5"/>
+                        <TextBlock Grid.Row="1" Text="Transactions:  " FontWeight="SemiBold" FontSize="13" MaxHeight="300" Padding="5"/>
+                        <TextBlock  Grid.Row="0" Grid.Column="1" FontSize="13" Text="{Binding Programs}" HorizontalAlignment="Left" TextWrapping="Wrap" MaxHeight="300" IsTextSelectionEnabled="True" Padding="5" />
+                        <TextBlock Grid.Row="1" Grid.Column="1" FontSize="13" Text="{Binding Transactions}" HorizontalAlignment="Left" TextWrapping="Wrap" MaxHeight="300" IsTextSelectionEnabled="True" Padding="5" />
                         <controls:DataGrid x:Name="ctrUserRow" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="5">
                             <controls:DataGrid.Columns>
-                                <controls:DataGridTextColumn Header="Date" Tag="Date" Binding="{Binding Date}" />
-                                <controls:DataGridTextColumn Header="Time" Tag="Time" Binding="{Binding Time}" />
-                                <controls:DataGridTextColumn Header="Cl" Tag="Cl" Binding="{Binding Cl}" />
-                                <controls:DataGridTextColumn Header="PC Name"  Tag="PC_Name" Binding="{Binding PCName}"/>
-                                <controls:DataGridTextColumn Header="Cod Tranzactie"  Tag="Cod_Tranzactie" Binding="{Binding Transaction}" />
-                                <controls:DataGridTextColumn Header="Program"  Tag="Program" Binding="{Binding Program}" />
-                                <controls:DataGridTextColumn Header="Audit Log"  Tag="Audit_Log" Binding="{Binding AuditLog}" />
-                                <controls:DataGridTextColumn Header="Variable Log"  Tag="Variable_Log" Binding="{Binding VarLog}" />
+                                <controls:DataGridTextColumn Header="Date" Tag="Date"  />
+                                <controls:DataGridTextColumn Header="Time" Tag="Time"  />
+                                <controls:DataGridTextColumn Header="Cl" Tag="Cl"  />
+                                <controls:DataGridTextColumn Header="PC Name"  Tag="PC_Name" />
+                                <controls:DataGridTextColumn Header="Cod Tranzactie"  Tag="Cod_Tranzactie" />
+                                <controls:DataGridTextColumn Header="Program"  Tag="Program"  />
+                                <controls:DataGridTextColumn Header="Audit Log"  Tag="Audit_Log"  />
+                                <controls:DataGridTextColumn Header="Variable Log"  Tag="Variable_Log"  />
                             </controls:DataGrid.Columns>
                         </controls:DataGrid>
                     </Grid>
@@ -77,19 +77,17 @@
 
         <controls:DataGrid x:Name="ctrlDataGrid" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="15" AutoGenerateColumns="False" IsReadOnly="True"
                            VerticalAlignment="Top" HorizontalAlignment="Stretch" MaxColumnWidth="400" CanUserSortColumns="True" CanUserReorderColumns="True"
-                           GridLinesVisibility="None" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible" 
+                           GridLinesVisibility="None" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
                            RowDetailsTemplate="{StaticResource RowDetailsTemplate}" SelectionMode="Single" RowDetailsVisibilityMode="VisibleWhenSelected" LoadingRowDetails="CtrlDataGrid_LoadingRowDetails">
             <controls:DataGrid.Columns>
                 <controls:DataGridTextColumn Header="Id" Tag="Id" Binding="{Binding Id}" />
                 <controls:DataGridTextColumn Header="Name" Tag="Name" Binding="{Binding Name}" />
-                <controls:DataGridTextColumn Header="Date" Tag="Date" Binding="{Binding DateInterval}" />
+                <controls:DataGridTextColumn Header="Date Interval" Tag="DateInterval" Binding="{Binding DateInterval}" />
                 <controls:DataGridTextColumn Header="Time Interval" Tag="TimeInterval" Binding="{Binding TimeInterval}" />
                 <controls:DataGridTextColumn Header="Total Programs"  Tag="TotalPrograms" Binding="{Binding TotalPrograms}" CanUserSort="True"/>
                 <controls:DataGridTextColumn Header="Top Program"  Tag="TopProgram" Binding="{Binding TopProgram}"/>
                 <controls:DataGridTextColumn Header="Total Transactions"  Tag="TotalTransactions" Binding="{Binding TotalTransactions}" />
-                <controls:DataGridTextColumn Header="TopTransaction"  Tag="TopTransaction" Binding="{Binding TopTransaction}" />
-                <controls:DataGridTextColumn Header="Audit Log"  Tag="Audit_Log" Binding="{Binding AuditLog}" />
-                <controls:DataGridTextColumn Header="Variable Log"  Tag="Variable_Log" Binding="{Binding VarLog}" />
+                <controls:DataGridTextColumn Header="Top Transaction"  Tag="TopTransaction" Binding="{Binding TopTransaction}" />
             </controls:DataGrid.Columns>
         </controls:DataGrid>
         <TextBlock Grid.Column="2" HorizontalAlignment="Left" Margin="0,20,0,0" Grid.Row="1" Text="GridLinesVisibility" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Bold" FontFamily="Segoe UI" FontSize="14"/>

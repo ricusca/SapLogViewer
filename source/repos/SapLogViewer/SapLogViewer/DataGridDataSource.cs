@@ -36,6 +36,105 @@ namespace SapLogViewer
             return _items;
         }
 
+        public string CachedSortedColumn
+        {
+            get
+            {
+                return _cachedSortedColumn;
+            }
+
+            set
+            {
+                _cachedSortedColumn = value;
+            }
+        }
+
+        public enum FilterOptions
+        {
+            All = -1,
+            Name = 0,
+            Program = 1,
+            Transaction = 2,
+            PC = 3,
+        }
+
+        public ObservableCollection<User> SortData(string sortBy, bool ascending)
+        {
+            _cachedSortedColumn = sortBy;
+            switch (sortBy)
+            {
+                case "Name":
+                    if (ascending)
+                    {
+                        return new ObservableCollection<User>(from item in _items
+                                                                          orderby item.Name ascending
+                                                                          select item);
+                    }
+                    else
+                    {
+                        return new ObservableCollection<User>(from item in _items
+                                                                          orderby item.Name descending
+                                                                          select item);
+                    }
+
+                case "TotalPrograms":
+                    if (ascending)
+                    {
+                        return new ObservableCollection<User>(from item in _items
+                                                                          orderby item.TotalPrograms ascending
+                                                                          select item);
+                    }
+                    else
+                    {
+                        return new ObservableCollection<User>(from item in _items
+                                                                          orderby item.TotalPrograms descending
+                                                                          select item);
+                    }
+
+                case "TotalTransactions":
+                    if (ascending)
+                    {
+                        return new ObservableCollection<User>(from item in _items
+                                                                          orderby item.TotalTransactions ascending
+                                                                          select item);
+                    }
+                    else
+                    {
+                        return new ObservableCollection<User>(from item in _items
+                                                                          orderby item.TotalTransactions descending
+                                                                          select item);
+                    }
+            }
+
+            return _items;
+        }
+
+        public ObservableCollection<User> FilterData(FilterOptions filterBy, string val)
+        {
+            switch (filterBy)
+            {
+                case FilterOptions.All:
+                    return new ObservableCollection<User>(_items);
+
+                case FilterOptions.Name:
+                    return new ObservableCollection<User>(from item in _items
+                                                          where item.Name.ToUpper().Contains(val)
+                                                          select item);
+
+                case FilterOptions.Transaction:
+                    return new ObservableCollection<User>(from item in _items
+                                                          where item.GetPrograms().Where(x => x.ToUpper().Contains(val)).Count() > 0
+                                                          select item);
+
+                case FilterOptions.Program:
+                    return new ObservableCollection<User>(from item in _items
+                                                          where item.GetPrograms().Where(x => x.ToUpper().Contains(val)).Count() > 0
+                                                          select item);
+            }
+
+            return _items;
+        }
+
         public void ThreadPoolCallback(object state)
         {
             List<IRandomAccessStreamWithContentType> streams = state as List<IRandomAccessStreamWithContentType>;
@@ -62,8 +161,8 @@ namespace SapLogViewer
                                     PCName      = Globals.GetStringId(ref Globals._pc, values[5]).ToString(),
                                     Transaction = Globals.GetStringId(ref Globals._transactions, values[6]).ToString(),
                                     Program     = Globals.GetStringId(ref Globals._programs, values[7]).ToString(),
-                                    AuditLog    = Globals.GetStringId(ref Globals._auditLog, values[8]).ToString(),
-                                    VarLog      = Globals.GetStringId(ref Globals._varLog, values[9]).ToString()
+                                    //AuditLog    = Globals.GetStringId(ref Globals._auditLog, values[8]).ToString(),
+                                    //VarLog      = Globals.GetStringId(ref Globals._varLog, values[9]).ToString()
                                 });
 
                         }
