@@ -49,9 +49,6 @@ namespace SapLogViewer
                     {
                         string line = sr.ReadLine();
                         string[] values = line.Split('|');
-                        //Regex g = new Regex(@"\|(\d{2}\.\d{2}\.\d{4})\|(\d{2}:\d{2}:\d{2})\|(\d*|)\|(.*?)\|(.*?)\|(.*?)\|(.*?)\|(.*?)\|(.*?)\|", RegexOptions.IgnoreCase | RegexOptions.Singleline);
-                        //Match m = g.Match(line);
-                        //if (m.Success)
                         if (values.Length > 9 && values[1].ToCharArray()[0] != 'D')
                         {
 
