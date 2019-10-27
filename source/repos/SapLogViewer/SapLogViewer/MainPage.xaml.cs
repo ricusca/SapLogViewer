@@ -15,6 +15,10 @@ using Windows.UI.Xaml.Navigation;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using Windows.Storage.Pickers;
 using Windows.Storage;
+using System.Threading;
+using Windows.Storage.Streams;
+using System.ComponentModel;
+using Windows.UI.Xaml.Shapes;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -26,21 +30,26 @@ namespace SapLogViewer
     public sealed partial class MainPage : Page
     {
         private DataGridDataSource viewModel = new DataGridDataSource();
-
         public MainPage()
         {
             this.InitializeComponent();
+            ctrlNoUsers.Text = "";
+            ctrlTotalTransactions.Text = "";
+            ctrlTopPUser.Text = "";
+            ctrlTopTUser.Text = "";
         }
 
-        private void Grid_Loading(FrameworkElement sender, object args)
+        private void Grid_Loading(FrameworkElement control, object args)
         {
             ctrlDataGrid.Sorting += DataGrid_Sorting;
             ctrlDataGrid.LoadingRowGroup += DataGrid_LoadingRowGroup;
+            ctrlComboBox.ItemsSource = Enum.GetValues(typeof(DataGridGridLinesVisibility)).Cast<DataGridGridLinesVisibility>();
+            ctrlComboBox.SelectedIndex = 0;
         }
 
         private void DataGrid_Sorting(object sender, DataGridColumnEventArgs e)
         {
-
+            
         }
 
         private void DataGrid_LoadingRowGroup(object sender, DataGridRowGroupHeaderEventArgs e)
@@ -50,8 +59,10 @@ namespace SapLogViewer
             //e.RowGroupHeader.PropertyValue = item.Range;
         }
 
-        private async void Button_Click(object sender, RoutedEventArgs e)
+        private async void Button_Load(object sender, RoutedEventArgs e)
         {
+            ctrlListBox.Items.Clear();
+            viewModel.Clear();
             var picker = new Windows.Storage.Pickers.FileOpenPicker();
             picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.List;
             picker.FileTypeFilter.Add(".txt");
@@ -59,9 +70,65 @@ namespace SapLogViewer
             picker.FileTypeFilter.Add("*");
 
             IReadOnlyList<StorageFile> files = await picker.PickMultipleFilesAsync();
-            if (files.Count > 0) {
-                ctrlDataGrid.ItemsSource = await viewModel.GetDataAsync(files);
+            List<IRandomAccessStreamWithContentType> randomStreams = new List<IRandomAccessStreamWithContentType>();
+            for (int i = 0; i < files.Count; i++)
+            {
+                ctrlListBox.Items.Add(files[i].Path);
+                randomStreams.Add(await files[i].OpenReadAsync());
             }
+            var bw = new BackgroundWorker();
+            bw.DoWork += (s, args) =>
+            {
+                viewModel.ThreadPoolCallback(randomStreams);
+            };
+
+            bw.RunWorkerCompleted += (s, args) =>
+            {
+                ctrlDataGrid.ItemsSource = null;
+                ctrlDataGrid.ItemsSource = viewModel.GetData();
+                ctrlLoading.IsLoading = false;
+                UpdateStatisticsUI();
+            };
+
+            bw.RunWorkerAsync();
+
+            if (LoadingContentControl != null)
+            {
+                LoadingContentControl.ContentTemplate = Resources["WaitListTemplate"] as DataTemplate;
+                ctrlLoading.IsLoading = true;                
+            }
+        }
+
+        private void UpdateStatisticsUI()
+        {
+            ctrlNoUsers.Text = string.Format("No. users: {0}", Statistics.TotalUsers);
+            ctrlTotalTransactions.Text = string.Format("Total Transactions: {0}", Statistics.TotalTransactions);
+            ctrlTopPUser.Text = string.Format("Top Programs User: {0}", Statistics.TopPUser);
+            ctrlTopTUser.Text = string.Format("Top Transactions User: {0}", Statistics.TopTUser);
+        }
+
+        private void CtrlComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(ctrlComboBox.SelectedValue.ToString()))
+            {
+                DataGridGridLinesVisibility val;
+                Enum.TryParse(ctrlComboBox.SelectedValue.ToString(), out val);
+                ctrlDataGrid.GridLinesVisibility = val;
+            }
+        }
+
+        private void CtrlSearch_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            //(ctrlDataGrid.soru). = string.Format("Name LIKE '%{0}%'", searchTextBox.Text);
+        }
+
+        private void CtrlDataGrid_LoadingRowDetails(object sender, DataGridRowDetailsEventArgs e)
+        {
+            StackPanel panel = e.DetailsElement as StackPanel;
+            Grid grid = panel.Children.ElementAt(0) as Grid;
+
+            DataGrid innerGrid = panel.FindName("ctrUserRow") as DataGrid;
+            innerGrid.ItemsSource = Globals._usersData["RAVRAM"].Actions;
         }
     }
 }

@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Streams;
@@ -15,25 +16,30 @@ namespace SapLogViewer
     [Bindable]
     public class DataGridDataSource
     {
-        private static ObservableCollection<DataGridDataItem> _items;
-        private static List<string> _users;
+        private static ObservableCollection<User> _items = new ObservableCollection<User>();
 //        private static CollectionViewSource groupedItems;
         private string _cachedSortedColumn = string.Empty;
-        private Dictionary<string, List<DataGridDataItem>> _usersData;
 
-        private string[] formats = {"dd.MM.yyy", "hh:mm:ss"};
-
-        public async Task<IEnumerable<DataGridDataItem>> GetDataAsync(IReadOnlyList<StorageFile> files)
+        public void Clear()
         {
-            List<IRandomAccessStreamWithContentType> streams = new List<IRandomAccessStreamWithContentType>();
-            _usersData = new Dictionary<string, List<DataGridDataItem>>();
-            _items = new ObservableCollection<DataGridDataItem>();
-            List < DataGridDataItem > logItems = new List<DataGridDataItem>();
-            foreach(var file in files) {
-                IRandomAccessStreamWithContentType randomStream = await file.OpenReadAsync();
-                streams.Add(randomStream);
+            _items.Clear();
+            Globals._usersData.Clear();
+            Globals.Clear();
+        }
+
+        public IEnumerable<User> GetData()
+        {
+            foreach(var user in Globals._usersData.Values)
+            {
+                _items.Add(user);
             }
-            
+            return _items;
+        }
+
+        public void ThreadPoolCallback(object state)
+        {
+            List<IRandomAccessStreamWithContentType> streams = state as List<IRandomAccessStreamWithContentType>;
+            List<DataGridDataItem> logItems = new List<DataGridDataItem>();
             Parallel.ForEach(streams, (randomStream) =>
             {
                 List<DataGridDataItem> items = new List<DataGridDataItem>();
@@ -48,18 +54,19 @@ namespace SapLogViewer
                         //if (m.Success)
                         if (values.Length > 9 && values[1].ToCharArray()[0] != 'D')
                         {
+
                             items.Add(
                                 new DataGridDataItem()
                                 {
-                                    Date        = values[1],
-                                    Time        = values[2],
-                                    Cl          = values[3],
-                                    User        = values[4],
-                                    PCName      = values[5],
-                                    Transaction = values[6],
-                                    Program     = values[7],
-                                    AuditLog    = values[8],
-                                    VarLog      = values[9]
+                                    Date = Globals.GetStringId(ref Globals._dates, values[1]).ToString(),
+                                    Time = values[2],
+                                    Cl = values[3],
+                                    User = Globals.GetStringId(ref Globals._users,values[4]).ToString(),
+                                    PCName      = Globals.GetStringId(ref Globals._pc, values[5]).ToString(),
+                                    Transaction = Globals.GetStringId(ref Globals._transactions, values[6]).ToString(),
+                                    Program     = Globals.GetStringId(ref Globals._programs, values[7]).ToString(),
+                                    AuditLog    = Globals.GetStringId(ref Globals._auditLog, values[8]).ToString(),
+                                    VarLog      = Globals.GetStringId(ref Globals._varLog, values[9]).ToString()
                                 });
 
                         }
@@ -73,18 +80,20 @@ namespace SapLogViewer
                 System.GC.Collect();
             });
 
+            int Id = 1;
             foreach(var item in logItems)
             {
-                if (!_usersData.ContainsKey(item.User))
+                if (!Globals._usersData.ContainsKey(item.User))
                 {
-                    _usersData.Add(item.User, new List<DataGridDataItem>());
-                    _items.Add(item);
+                    var user = new User(new List<DataGridDataItem>(), Id++, item.User);
+                    Globals._usersData.Add(user.Name, user);
                 }
-                _usersData[item.User].Add(item);
+                Globals._usersData[item.User].Actions.Add(item);
             }
-            logItems.Clear();
 
-            return _items;
+            Statistics.Update(ref Globals._usersData);
+
+            logItems.Clear();           
         }
     }
 }
